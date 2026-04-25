@@ -222,52 +222,52 @@
     <h2>Ages</h2>
     <div class="input-group">
       <div class="input-row"><label>Spouse 1 age today</label><span class="val mono" id="v-henryAge"></span></div>
-      <input id="i-henryAge" type="range" min="30" max="50" step="1" value="">
+      <input id="i-henryAge" type="range" min="0" max="80" step="1" value="0">
     </div>
     <div class="input-group">
       <div class="input-row"><label>Retire at</label><span class="val mono" id="v-retireAge"></span></div>
-      <input id="i-retireAge" type="range" min="45" max="70" step="1" value="">
+      <input id="i-retireAge" type="range" min="0" max="80" step="1" value="0">
     </div>
 
     <h2>Income</h2>
     <div class="input-group">
       <div class="input-row"><label>Spouse 1 (gross)</label><span class="val mono" id="v-henryInc"></span></div>
-      <input id="i-henryInc" type="range" min="100000" max="400000" step="5000" value="0">
+      <input id="i-henryInc" type="range" min="0" max="400000" step="5000" value="0">
     </div>
     <div class="input-group">
       <div class="input-row"><label>Spouse 2 (gross)</label><span class="val mono" id="v-hadleyInc"></span></div>
-      <input id="i-hadleyInc" type="range" min="50000" max="250000" step="5000" value="0">
+      <input id="i-hadleyInc" type="range" min="0" max="250000" step="5000" value="0">
     </div>
     <div class="input-group">
       <div class="input-row"><label>Income growth / yr (real)</label><span class="val mono" id="v-incGrow"></span></div>
-      <input id="i-incGrow" type="range" min="0" max="5" step="0.5" value="3">
+      <input id="i-incGrow" type="range" min="0" max="5" step="0.5" value="0">
     </div>
     <div class="input-group">
       <div class="input-row"><label>Expense growth / yr (real)</label><span class="val mono" id="v-expGrow"></span></div>
-      <input id="i-expGrow" type="range" min="0" max="5" step="0.5" value="2">
+      <input id="i-expGrow" type="range" min="0" max="5" step="0.5" value="0">
     </div>
 
     <h2>Returns & inflation</h2>
     <div class="input-group">
       <div class="input-row"><label>Real return</label><span class="val mono" id="v-realRet"></span></div>
-      <input id="i-realRet" type="range" min="2" max="12" step="0.5" value="6.5">
+      <input id="i-realRet" type="range" min="0" max="12" step="0.5" value="0">
     </div>
     <div class="input-group">
       <div class="input-row"><label>Home appreciation (real)</label><span class="val mono" id="v-homeRet"></span></div>
-      <input id="i-homeRet" type="range" min="0" max="5" step="0.5" value="1">
+      <input id="i-homeRet" type="range" min="0" max="5" step="0.5" value="0">
     </div>
 
     <h2>Taxes</h2>
     <div class="input-group">
       <div class="input-row"><label>Effective tax rate</label><span class="val mono" id="v-taxRate"></span></div>
-      <input id="i-taxRate" type="range" min="20" max="45" step="1" value="35">
+      <input id="i-taxRate" type="range" min="0" max="50" step="1" value="0">
     </div>
     <p style="color:var(--text-mute);font-size:11px;line-height:1.5;margin-top:-4px">Applied to (gross − 401K). Includes federal + state + FICA. Lower after retirement.</p>
 
     <h2>Savings & contributions</h2>
     <div class="input-group">
       <div class="input-row"><label>401K rate (of combined gross)</label><span class="val mono" id="v-k401"></span></div>
-      <input id="i-k401" type="range" min="0" max="25" step="1" value="10">
+      <input id="i-k401" type="range" min="0" max="25" step="1" value="0">
     </div>
     <div class="input-group">
       <div class="input-row"><label>529 per child /yr</label><span class="val mono" id="v-k529"></span></div>
@@ -287,7 +287,7 @@
     <h2>Retirement spending</h2>
     <div class="input-group">
       <div class="input-row"><label>Annual spend in retirement</label><span class="val mono" id="v-retSpend"></span></div>
-      <input id="i-retSpend" type="range" min="60000" max="250000" step="2500" value="100000">
+      <input id="i-retSpend" type="range" min="0" max="250000" step="2500" value="0">
     </div>
     <p style="color:var(--text-mute);font-size:11px;line-height:1.5;margin-top:-4px">Default = Budget tab total minus the 3 kids' child-specific line items. Today's dollars.</p>
 
@@ -317,119 +317,6 @@
       </div>
     </div>
 
-    <!-- HIDDEN: legacy hardcoded Q1 2026 panel, kept for reference, never displayed -->
-    <div style="display:none"><!-- ====== Q1 2026 QUARTERLY REPORT — collapsible ====== -->
-    <div class="panel" style="display:none;border-color:var(--border-bright);padding:0;overflow:hidden">
-      <button onclick="toggleQR()" style="width:100%;background:none;border:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--text);font-weight:700">QUARTERLY REVIEW — Q1 2026</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-mute)">Generated 2026-04-19 · Age 37 · 18 yrs to retirement</span>
-        </div>
-        <span id="qr-chevron" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);transition:transform .2s">▶</span>
-      </button>
-      <div id="qr-body" style="display:none;padding:0 18px 18px">
-
-        <!-- Snapshot row -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:22px">
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">LIQUID</div>
-            <div style="font-size:20px;font-weight:700;color:var(--accent)">$916K</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">equities + crypto</div>
-          </div>
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">401K + IRAs</div>
-            <div style="font-size:20px;font-weight:700;color:var(--text)">$404K</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">Spouse 1 + Spouse 2 + all IRAs</div>
-          </div>
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">NET WORTH</div>
-            <div style="font-size:20px;font-weight:700;color:var(--accent2)">~$1.50M</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">incl. home equity</div>
-          </div>
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">TARGET @ 55</div>
-            <div style="font-size:20px;font-weight:700;color:var(--accent4)">$3.1M+</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">liquid at 4% SWR</div>
-          </div>
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">BASELINE PATH</div>
-            <div style="font-size:20px;font-weight:700;color:var(--accent2)">ON TRACK</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">existing assets → ~$2.9M</div>
-          </div>
-        </div>
-
-        <!-- Action items -->
-        <h4 style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--text-mute);text-transform:uppercase;margin:0 0 12px">Top Opportunities — Ranked by Impact</h4>
-        <div style="display:grid;gap:10px;margin-bottom:24px">
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">1 · Maximize 401K contributions</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);background:rgba(0,229,255,.08);padding:2px 8px;border-radius:3px">+~$570K at retirement</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">You're contributing 10% of gross (~$28.5K/yr combined). The 2026 IRS limit is <strong style="color:var(--text)">$23,500/person = $47K/yr combined</strong> — you're leaving ~$18.5K/yr of tax-advantaged space on the table. At your 35% effective rate that's ~$6.5K/yr in taxes saved today, plus the $18.5K compounding at 6.5% for 18 years. <strong style="color:var(--accent2)">Rule of 55 applies</strong>: retiring exactly at 55 and separating from your employer means penalty-free 401K withdrawals immediately — the "can't touch until 59.5" concern doesn't apply.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(0,229,255,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent)">ACTION → Bump both contribution rates to hit $23,500 limit each.</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">2 · Backdoor Roth IRA — both spouses</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);background:rgba(122,252,176,.08);padding:2px 8px;border-radius:3px">+~$432K tax-free</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">At $285K+ combined income you're above the direct Roth contribution limit. Backdoor Roth: contribute to a traditional IRA (non-deductible) then immediately convert to Roth. <strong style="color:var(--text)">$7,000/person/yr = $14K/yr</strong>, grows and withdraws tax-free in retirement. No pro-rata tax issue as long as you hold no other pre-tax IRA balances. Over 18 years at 6.5% = ~$432K tax-free at retirement.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(122,252,176,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent2)">ACTION → Roll Hadley's $32K IRA → Atlassian 401K first; then execute 2026 backdoor for both.</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent4);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">3 · Redeploy excess cash</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent4);background:rgba(255,179,71,.08);padding:2px 8px;border-radius:3px">~$50K sitting idle</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">You hold ~$105K in Cash + SWVXX — roughly 2× your 3–6 month emergency fund target of $45–55K. The excess <strong style="color:var(--text)">~$50K</strong> is earning money-market rates instead of compounding at 6.5%. Keep $55K as your emergency fund in SWVXX (currently ~4.5% yield, fine). Put the rest to work.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(255,179,71,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent4)">ACTION → Move ~$50K from cash/SWVXX into SCHB or QQQ.</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--violet);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">4 · Tech concentration risk</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--violet);background:rgba(165,139,255,.08);padding:2px 8px;border-radius:3px">42% in tech/semis</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">QQQ (32%) + SMH (10%) = 42% of liquid portfolio in tech and semiconductors — and QQQ itself is ~30% large-cap tech names internally. Add TSLA at 8% ($69K single-stock), plus crypto at 6%. A 2022-style tech correction (–35%) would cost ~<strong style="color:var(--text)">$170K</strong> in those positions. This is a deliberate aggressive-growth bet — eyes-open fine — but worth asking: does SMH duplicate what QQQ already owns? Is TSLA a conviction hold?</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(165,139,255,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--violet)">DISCUSS → Confirm TSLA conviction + whether SMH is additive or redundant vs QQQ.</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">5 · Open 529s for Emme &amp; Reese</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3);background:rgba(255,85,119,.08);padding:2px 8px;border-radius:3px">OPEN ACTION ITEM</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">The twins are 2 months old and have no 529 accounts. Every month of delay is compounding they never recover. At 7% growth, $200/mo started today vs. 6 months from now = ~$4K difference at age 18 — small but completely free to fix. Contribution split locked in: <strong style="color:var(--text)">$200/mo each</strong> (Harlow, Emme, Reese) = $600/mo total.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(255,85,119,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent3)">ACTION → Open 529 accounts for Emme and Reese. Maine NextGen plan recommended for state tax deduction.</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--text-mute);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">6 · Estate documents</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-mute);background:var(--bg);padding:2px 8px;border-radius:3px">ANNUAL FLAG</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">Three kids under 3 with no will, no healthcare proxy, and no guardianship designation. This is the one place where "aggressive" doesn't apply. A local estate attorney runs ~$1,500–$2,500 and protects everything you're building for the family.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(84,97,118,.1);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-dim)">ACTION → Schedule estate attorney consult before Q2 end.</div>
-          </div>
-
-        </div>
-
-        <!-- Key watch number -->
-        <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:4px;padding:14px 16px">
-          <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--accent);margin-bottom:8px">THE NUMBER TO WATCH</div>
-          <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.7">
-            <strong style="color:var(--text)">Implied safe withdrawal rate at retirement</strong> — visible in the KPIs above. Target: stay below 4% of liquid assets. Two things move it most favorably: (1) maximizing 401K contributions now, and (2) the childcare cash-flow cliff in <strong style="color:var(--text)">2028</strong> (Harlow starts Pre-K at Ocean House free) and <strong style="color:var(--text)">2030</strong> (twins start Pre-K free). Those two events progressively unlock childcare savings capacity at exactly the moment your portfolio is largest — a structural tailwind to the retire-at-55 plan.
-          </p>
-        </div>
-        <p style="margin:16px 0 0;font-size:10px;color:var(--text-mute);font-family:'JetBrains Mono',monospace">NEXT REVIEW: Q2 2026 (July) · Claude is not a licensed financial advisor — confirm tax strategy changes with a CPA before acting.</p>
-
-      </div><!-- end qr-body -->
-    </div><!-- end quarterly panel -->
-    </div><!-- end hidden legacy wrapper -->
 
     <!-- ====== REMINDERS — collapsible ====== -->
     <div class="panel" style="padding:0;overflow:hidden">
@@ -567,7 +454,7 @@
       </div>
       <div class="panel">
         <h3>Childcare cost waterfall</h3>
-        <p class="desc">The $55K → $40K → $0 cliff as kids hit free public kindergarten.</p>
+        <p class="desc">Childcare costs typically step down as each child ages into free public school.</p>
         <div class="chart-wrap small"><canvas id="chart-cc"></canvas></div>
       </div>
     </div>
@@ -638,109 +525,6 @@
       </div>
     </div>
 
-    <!-- HIDDEN: legacy hardcoded Q1 2026 spending panel, kept for reference -->
-    <div style="display:none"><!-- ====== Q1 2026 SPENDING REVIEW — collapsible ====== -->
-    <div class="panel" style="display:none;border-color:var(--border-bright);padding:0;overflow:hidden">
-      <button onclick="toggleSQR()" style="width:100%;background:none;border:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--text);font-weight:700">QUARTERLY SPENDING REVIEW — Q1 2026</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-mute)">Jan–Mar 2026 · $12,000/mo budget · $36,000 quarterly target</span>
-        </div>
-        <span id="sqr-chevron" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);transition:transform .2s">▶</span>
-      </button>
-      <div id="sqr-body" style="display:none;padding:0 18px 18px">
-
-        <!-- Snapshot row -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:22px">
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">Q1 TOTAL SPEND</div>
-            <div style="font-size:20px;font-weight:700;color:var(--violet)">$51,571</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">vs $36,000 target</div>
-          </div>
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">AVG / MO</div>
-            <div style="font-size:20px;font-weight:700;color:var(--accent4)">$17,190</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">+43% over budget</div>
-          </div>
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">EX HOUSE PROJECTS</div>
-            <div style="font-size:20px;font-weight:700;color:var(--accent2)">~$12,400</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">normalized /mo — on budget</div>
-          </div>
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">HOUSE PROJECTS</div>
-            <div style="font-size:20px;font-weight:700;color:var(--accent)">~$16,200</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">Jan + Feb contractor checks</div>
-          </div>
-          <div style="background:var(--bg-card);padding:14px 16px">
-            <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin-bottom:6px">VERDICT</div>
-            <div style="font-size:20px;font-weight:700;color:var(--accent2)">ON TRACK</div>
-            <div style="font-size:10px;color:var(--text-dim);margin-top:3px">ex one-offs</div>
-          </div>
-        </div>
-
-        <!-- Category performance -->
-        <h4 style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--text-mute);text-transform:uppercase;margin:0 0 12px">Category Performance — Q1 Avg/mo vs Budget</h4>
-        <div style="display:grid;gap:10px;margin-bottom:24px">
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">Housing — $10,176/mo vs $4,800 budget</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3);background:rgba(255,85,119,.08);padding:2px 8px;border-radius:3px">+112% over</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">Jan ($14,648) and Feb ($11,577) both carried large contractor checks — kitchen/bath finish work from the Q4 2025 projects closing out. Mar normalized to $4,303, right at budget. Recurring housing (mortgage, CMP, water, insurance, internet, propane) averages ~$4,200/mo — the budget is calibrated correctly, Q1 just absorbed one-time project closeout.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(255,85,119,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent3)">WATCH → No more $4K+ checks are planned for Q2. If one lands, track it as a project overrun not a budget miss.</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent4);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">Childcare — $1,892/mo vs $1,600 budget</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent4);background:rgba(255,179,71,.08);padding:2px 8px;border-radius:3px">+18% over</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">Nanny + part-time daycare running slightly hot. Nothing dramatic — a few extra weeks of coverage. The real number to watch is 2028 when Harlow ages into Ocean House Pre-K (free) and childcare drops by ~$1,400/mo.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(255,179,71,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent4)">WATCH → Q2 typically adds summer camp deposits. Expect spike; not a budget failure.</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">Discretionary — UNDER across the board</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);background:rgba(122,252,176,.08);padding:2px 8px;border-radius:3px">−$400/mo saved</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">Dining $626 vs $750 (−17%) · Shopping $611 vs $750 (−19%) · Travel $15 vs $350 (−96%) · Health $95 vs $300 (−68%) · Subs $67 vs $100 (−33%). Combined these five categories are running $395/mo under budget. Travel is low because Q1 is always low — expect Q2/Q3 to pull up the annual average. Everything else reflects real discipline with newborn twins at home.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(122,252,176,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent2)">OBSERVATION → You have real headroom in discretionary. Not a reason to spend more — it's a reason to redirect excess to investments.</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--violet);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">Golf — $675/mo vs $500 budget</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--violet);background:rgba(165,139,255,.08);padding:2px 8px;border-radius:3px">+35% over</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">Q1 includes Tobacco Road trip ($1,191 in Mar) and Purpoodock annual dues ($833 in Jan). These are lumpy — Q2–Q3 greens fees will continue to push this over. Either bump the budget to $650/mo (truer annual average) or accept the overage as a known line item.</p>
-            <div style="margin-top:10px;padding:8px 10px;background:rgba(165,139,255,.05);border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--violet)">DISCUSS → Raise Golf budget to $650/mo, pull $150 from Travel/Health slack?</div>
-          </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--text-mute);border-radius:4px;padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
-              <span style="font-weight:600;font-size:13px">Other — $1,314/mo vs $1,200 budget</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-mute);background:var(--bg);padding:2px 8px;border-radius:3px">+9% over</span>
-            </div>
-            <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.6">Right where it's supposed to be. Other is the bucket for taxes, Venmo/Zelle reimbursements, and uncategorizable miscellany — designed to run around $1,200/mo. Q2 will spike with April tax payments (already visible in the April row at $8,491), but that's a known annual pattern, not a budget breach.</p>
-          </div>
-
-        </div>
-
-        <!-- Key watch number -->
-        <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:4px;padding:14px 16px">
-          <div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--accent);margin-bottom:8px">THE NUMBER TO WATCH</div>
-          <p style="margin:0;font-size:12px;color:var(--text-dim);line-height:1.7">
-            <strong style="color:var(--text)">Normalized monthly spend ex-house-projects: ~$12,400</strong>. That's the real operating number, and it's <strong style="color:var(--accent2)">within $400/mo of the $12,000 target</strong>. The $43% quarterly overage is entirely explained by ~$16K of one-time contractor work clearing in Jan + Feb. If Q2 runs clean (no big house checks), the rolling-12M avg will drift down toward $13K and keep falling. Net: budget is right, discipline is real, one-offs are the only distortion.
-          </p>
-        </div>
-        <p style="margin:16px 0 0;font-size:10px;color:var(--text-mute);font-family:'JetBrains Mono',monospace">NEXT REVIEW: Q2 2026 (July) · Pulled from Bangor Savings checking + Apple Card. April 2026 data still incomplete pending AC statement upload.</p>
-
-      </div><!-- end sqr-body -->
-    </div><!-- end spending quarterly panel -->
-    </div><!-- end hidden legacy wrapper -->
 
     <!-- ====== FULL SPENDING ANALYSIS (Apple Card + Checking) ====== -->
     <div class="panel">
@@ -761,7 +545,7 @@
             <div class="chart-wrap small"><canvas id="chart-ac-monthly"></canvas></div>
           </div>
           <div>
-            <h4 style="font-size:12px;letter-spacing:.08em;color:var(--text-mute);margin:0 0 8px">HENRY VS HADLEY (APPLE CARD)</h4>
+            <h4 style="font-size:12px;letter-spacing:.08em;color:var(--text-mute);margin:0 0 8px">CARDHOLDER SPLIT (APPLE CARD)</h4>
             <div class="chart-wrap small"><canvas id="chart-ac-hh"></canvas></div>
           </div>
         </div>
@@ -976,8 +760,8 @@ const SS_START_AGE = 67;
 const COLLEGE_ANNUAL_TODAY = 35000;
 const COLLEGE_INFLATION = 0.05;
 const COLLEGE_YEARS = 4;
-const HARLOW_BIRTH_YEAR = HARLOW_BIRTH.getFullYear(); // 2023
-const TWINS_BIRTH_YEAR  = TWINS_BIRTH.getFullYear();  // 2026
+const HARLOW_BIRTH_YEAR = HARLOW_BIRTH.getFullYear();
+const TWINS_BIRTH_YEAR  = TWINS_BIRTH.getFullYear();
 function annualCollegeCost(collegeStartYear){
   return COLLEGE_ANNUAL_TODAY * Math.pow(1 + COLLEGE_INFLATION, collegeStartYear - CURRENT_YEAR);
 }
@@ -2169,8 +1953,8 @@ function handleCSV(text, save=true){
 const MANUAL_FIELDS = {
   'i-henry401k':  { def: '' },
   'i-hadley401k': { def: '' },
-  'i-home0':      { def: 325000 },
-  'i-k529h':      { def: 53939 },
+  'i-home0':      { def: 0 },
+  'i-k529h':      { def: 0 },
   'i-k529e':      { def: 0 },
   'i-k529r':      { def: 0 },
   'i-btc-qty':    { def: '' },
@@ -3008,7 +2792,8 @@ function renderPortfolioAnalysis(){
   const techPct = qqq + smh + tsla;
   const cryptoPct = cryptoTotal/portfolioTotal*100;
   const cashPct = totalCash/portfolioTotal*100;
-  const emergencyTarget = 52500; // ~3 months of ~$17.5K/mo spending
+  // Emergency fund target = 3 months of monthly budget (configurable via BUDGET_TOTAL)
+  const emergencyTarget = (typeof BUDGET_TOTAL === 'number' ? BUDGET_TOTAL : 12000) * 3;
   const excessCash = Math.max(0, totalCash - emergencyTarget);
 
   const snaps = getPortfolioSnaps();
