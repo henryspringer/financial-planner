@@ -38,7 +38,7 @@ Re-run this list every quarter (or whenever your balances meaningfully change) t
 **What the agent does:**
 
 - Inspects the CSV header row to identify date / description / amount / type columns
-- If your bank's layout differs from the default (Bangor Savings), edits `parseBangorCSV()` in `index.html` to match
+- If your bank's layout differs from the default expected columns, edits the checking parser (`parseCSV()`) in `index.html` to match
 - May rename the function to something generic like `parseCheckingCSV()`
 - Has you upload the CSV via the app's Monthly Uploads hub; data persists to localStorage
 
@@ -46,7 +46,7 @@ Re-run this list every quarter (or whenever your balances meaningfully change) t
 
 ## 2. Credit cards — CSV per card
 
-**Why:** categorized discretionary spending (groceries, dining, shopping, subscriptions, travel). If you use Apple Card, cardholder breakdown (Henry vs. Hadley) comes along for free.
+**Why:** categorized discretionary spending (groceries, dining, shopping, subscriptions, travel). If you use Apple Card, cardholder breakdown (e.g. spouse 1 vs. spouse 2) comes along for free.
 
 **Where to get it:**
 
@@ -82,12 +82,12 @@ Re-run this list every quarter (or whenever your balances meaningfully change) t
 
 For Fidelity, Vanguard, Robinhood, or anywhere else, simply say:
 
-> Taxable brokerage: $X (mostly VTI + individual tech stocks)
-> Roth IRA (Hadley): $Y
-> Traditional IRA (Henry): $Z
+> Taxable brokerage: $X (holdings mix, e.g. mostly index ETFs + a few individual stocks)
+> Roth IRA (spouse 1): $Y
+> Traditional IRA (spouse 2): $Z
 > HSA: $W
 
-The agent updates the input defaults. You don't need holdings-level detail unless you want the allocation view.
+The agent updates the input defaults in `index.html` to the values you provide. You don't need holdings-level detail unless you want the allocation view.
 
 ---
 
@@ -103,12 +103,12 @@ The agent updates the input defaults. You don't need holdings-level detail unles
 
 **Example:**
 
-> Henry: $180K at Atlassian 401(k), contributing 10% of $150K salary. 50% match up to 6%.
-> Hadley: $124K at Shopify 401(k), contributing 8% of $135K salary. Dollar-for-dollar match up to 5%.
+> Spouse 1: $[balance] at [provider] 401(k), contributing [X]% of $[salary]. [match terms].
+> Spouse 2: $[balance] at [provider] 401(k), contributing [X]% of $[salary]. [match terms].
 
 **What the agent updates:**
 
-- `i-henry401k`, `i-hadley401k` input defaults
+- `i-henry401k`, `i-hadley401k` input defaults (internal IDs — visible labels are "Spouse 1 / Spouse 2")
 - `i-k401` (contribution %)
 - `i-henryInc`, `i-hadleyInc` (gross income)
 
@@ -126,9 +126,9 @@ The agent updates the input defaults. You don't need holdings-level detail unles
 
 **Example:**
 
-> Harlow: $4,200 balance, $200/mo ongoing, Maine NextGen plan.
-> Emme: $0, starting $200/mo May 1.
-> Reese: $0, starting $200/mo May 1.
+> Child 1: $[balance], $[X]/mo ongoing, [plan provider].
+> Child 2: $[balance], $[X]/mo, [plan provider].
+> Child 3: $[balance], $[X]/mo, [plan provider].
 
 **What the agent updates:**
 
@@ -149,14 +149,14 @@ The agent updates the input defaults. You don't need holdings-level detail unles
 
 **Example:**
 
-> Home value: ~$850K (Zillow)
-> Mortgage balance: $620K at 3.125%, 26 years remaining
-> PITI: $3,800/mo
+> Home value: ~$[X] (Zillow / Redfin / appraisal)
+> Mortgage balance: $[X] at [rate]%, [N] years remaining
+> PITI: $[X]/mo
 
 **What the agent updates:**
 
-- `i-home0` input default
-- Housing line in `BUDGETS` if your PITI materially differs from $4,800/mo target
+- `i-home0` input default (computed home equity = value − mortgage)
+- Housing line in `BUDGETS` to match your PITI
 
 ---
 
@@ -179,27 +179,30 @@ Live prices are auto-fetched from CoinGecko on a button click; you don't need to
 - Your age, spouse's age
 - Target retirement age
 - Combined household gross income (or per-spouse)
-- Expected real return assumption (default: 6.5%)
-- Expected expense growth (default: 2.5%)
-- Tax rate estimate (default: 35%)
+- Expected real return assumption (typical: 5–7%)
+- Expected expense growth (typical: 2–3%)
+- Effective tax rate estimate (typical: 25–40% depending on bracket + state)
+
+All assumption inputs ship at 0 — set them yourself or have the agent set sensible values you confirm.
 
 **Example:**
 
-> Henry 37, Hadley 35, target retire 55.
-> Combined gross $285K.
-> Happy with default assumptions.
+> Spouse 1 [age], spouse 2 [age], target retire [age].
+> Combined gross $[X].
+> Use [X]% real return, [X]% expense growth, [X]% tax rate.
 
 ---
 
 ## 9. Kids — childcare schedule
 
-**Why:** the planner models childcare as a dynamic expense that drops as each kid hits free pre-K. This is often a ~$1,400/mo cliff per child that substantially changes the retire-at-X math.
+**Why:** the planner models childcare as a dynamic expense that drops as each kid hits free pre-K. This can be a meaningful per-child cliff that materially changes the retire-at-X math.
 
 **What to send:**
 
 - Each kid's name + birthdate (or current age)
+- Current weekly/monthly daycare or nanny rate per child (if any)
 - When they start free school (your local public pre-K age, or private school tuition if paying)
-- Any known step-functions (e.g. "daycare drops to after-school care when Harlow starts K in 2027")
+- Any known step-functions (e.g. "daycare drops to after-school care when [child] starts K in [year]")
 
 **What the agent updates:**
 
@@ -208,16 +211,20 @@ Live prices are auto-fetched from CoinGecko on a button click; you don't need to
 
 ---
 
-## 10. Monthly budget (optional — defaults shipped)
+## 10. Monthly budget
 
-The app ships with a $12,000/mo budget across 11 categories, calibrated to a growing family with young kids in New England. If your target differs, say so:
+The app ships with all 11 budget categories at $0. You define them. Send the agent a target per category, or a single monthly total and let the agent suggest a split:
 
-> Bump travel to $600, cut golf to $0, everything else is fine.
+> Set housing $X, childcare $X, groceries $X, dining $X, transport $X, travel $X, shopping $X, subs $X, health $X, golf $X, other $X.
+
+Or:
+
+> Total target $[X]/mo across the 11 categories — propose a split and I'll adjust.
 
 **What the agent updates:**
 
 - `BUDGETS` constant in `index.html`
-- Total auto-recalculates
+- Total auto-recalculates from the values you provide
 
 ---
 

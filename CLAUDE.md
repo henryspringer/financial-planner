@@ -81,14 +81,14 @@ When the user sends their numbers, update the `value=""` attribute on these HTML
 **Also update:**
 
 - Kids' names in `CHILDCARE_SCHEDULE`
-- Any spouse-name references in chart legends, quarterly review copy, etc. (search for `Henry` and `Hadley`)
+- Any spouse- or child-name references the user wants personalized. The shipped defaults use generic labels ("Spouse 1", "Child 1"); only update if the user wants their real names baked in (warn them re: forking publicly first)
 - Currency / locale if the user isn't in USD (harder — flag as out of scope unless asked)
 
 **Warn the user** if they're publishing a fork: "I've baked your balances into `index.html`. Anyone who sees your fork will see these numbers. Consider keeping a private copy and shipping only placeholder values in the public repo."
 
 ### Task: adapt the checking CSV parser
 
-`parseBangorCSV()` is hardcoded to Bangor Savings' column layout:
+The shipped checking parser (`parseCSV()`) expects a generic layout:
 
 ```
 Date, Description, Withdrawal, Deposit, Type, Check #, Balance
@@ -100,7 +100,7 @@ If the user's bank has a different layout:
 2. Identify which columns hold date, description, withdrawal, deposit, type, check number
 3. Edit the parser to match
 4. Consider renaming to `parseCheckingCSV()` for generality
-5. Also update the label in the upload hub if it says "Bangor"
+5. Also update the label in the upload hub if it references a specific bank name
 
 Common column variations:
 
@@ -115,7 +115,7 @@ If the user's bank has a single signed `Amount` column instead of separate Withd
 Apple Card is the default. If the user has a different card:
 
 1. If format has `Transaction Date, Merchant, Category, Amount`, it's close enough to Apple's layout — edit `parseAppleCardCSV()` to match column indices
-2. Most issuers don't provide Henry/Hadley-style cardholder splits — drop that column gracefully (set `who: 'You'`)
+2. Most issuers don't provide cardholder splits the way Apple Card does — drop that column gracefully (set `who: 'You'`)
 3. Category names vary wildly. Update `AC_TO_BUDGET` to map the issuer's category strings to the 11 budget buckets:
 
 ```js

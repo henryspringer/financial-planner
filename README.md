@@ -7,7 +7,7 @@ No backend. No tracking. No accounts to create. Fork it, personalize it, run it 
 ## What it does
 
 - **Plan tab** — long-term retirement projection. Net worth trajectory, SWR-based target at retirement, 401K / 529 / brokerage / home equity all modeled together. Dynamic childcare schedule that dials down as kids age into free pre-K.
-- **Spending tab** — rolling 12-month actuals pulled from your checking + credit card CSVs, bucketed into 11 categories, compared against a $12,000/mo budget target. Drill-in panel lets you inspect any category for any month.
+- **Spending tab** — rolling 12-month actuals pulled from your checking + credit card CSVs, bucketed into 11 categories, compared against a monthly budget you define. Drill-in panel lets you inspect any category for any month.
 - **Portfolio tab** — taxable brokerage tracker from Schwab position snapshots, with allocation drift and concentration risk callouts.
 - **Quarterly reviews** — "Generate Quarterly Review" button produces a written review of your spending or net-worth trajectory by handing your data snapshot to your AI agent of choice. The app ships with prompt templates.
 
@@ -15,7 +15,7 @@ No backend. No tracking. No accounts to create. Fork it, personalize it, run it 
 
 ### 1. Download
 
-Grab `index.html` from this repo. Open it in any modern browser. You'll see an empty dashboard — that's expected.
+Grab `index.html` from this repo. Open it in any modern browser. You'll see an empty dashboard with all values zeroed out — that's expected. Nothing is pre-populated; every number comes from you.
 
 ### 2. Gather your data
 

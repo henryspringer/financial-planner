@@ -140,7 +140,7 @@ Border-left color coding:
 
 - Advisor-grade, not sycophantic. Call out real risks without
   catastrophizing. Celebrate real wins without inflating.
-- Specific over general. "Roll Hadley's $32K traditional IRA into her
+- Specific over general. "Roll spouse 2's $32K traditional IRA into her
   401K to enable backdoor Roth" beats "consider Roth optimization."
 - Quantify impact. Every action card should attach a ballpark dollar
   figure at retirement age, even if it requires stating assumptions.

@@ -42,7 +42,7 @@ Variance: {{Q_VARIANCE_PCT}}
 
 ## Household context (user-provided at setup)
 {{USER_CONTEXT}}
-(e.g. "3 kids under 3, Henry's W2 is primary income, one-time kitchen
+(e.g. "3 kids under 3, one spouse's W2 is primary income, one-time kitchen
  reno closing out in Q1, aspirational $12K/mo budget")
 
 ---
