@@ -275,7 +275,7 @@
     </div>
 
     <h2>Monthly budget</h2>
-    <p style="color:var(--text-mute);font-size:11px;line-height:1.5;margin-top:-4px;margin-bottom:10px">Locked at <strong style="color:var(--text)">$12,000/mo</strong> across 11 categories. Edit in source if targets change. Tracked on the Spending tab; childcare modeled dynamically by the schedule below.</p>
+    <p style="color:var(--text-mute);font-size:11px;line-height:1.5;margin-top:-4px;margin-bottom:10px">Set per category in the <code>BUDGETS</code> constant in source. Tracked on the Spending tab; childcare modeled dynamically by the schedule below.</p>
     <div id="budget-readout" style="display:grid;gap:4px;font-family:'JetBrains Mono',monospace;font-size:11px;margin-bottom:10px"></div>
     <div class="stat-row" style="margin-bottom:12px;border-top:1px solid var(--border-bright);padding-top:8px">
       <span class="k" style="font-size:10px">Total budget</span>
@@ -576,7 +576,7 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px">
         <div>
           <h3 style="margin-bottom:4px">Actuals — monthly spending tracker</h3>
-          <p class="desc" style="margin:0">Budget: <strong style="color:var(--text)">$12,000/mo</strong> across 11 categories. Apple Card + checking combined. Large checks (house projects, contractors) roll into Housing; unidentified nanny/care payments roll into Childcare.</p>
+          <p class="desc" style="margin:0">Budget set per category in source (<code>BUDGETS</code>) across 11 categories. Apple Card + checking combined. Add your own merchant and check-number rules in <code>categorize()</code> and <code>CHECK_OVERRIDES</code>.</p>
         </div>
         <select id="actuals-year-select" style="display:none;background:var(--bg-card);border:1px solid var(--border-bright);color:var(--text);padding:6px 10px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;outline:none"
           onchange="actualsView=this.value==='rolling12'?'rolling12':+this.value;syncYearSelectors();renderActuals(parsedRows,readInputs().baseMo);if(acRows.length||parsedRows.length)renderAppleCard()"></select>
@@ -1191,7 +1191,7 @@ function renderReadouts(proj, I){
     <div class="stat-row"><span class="k">Net worth at age 80</span><span class="v">${fmt$exact((proj.rows.find(r=>r.age===80)||last).nw)}</span></div>
     <div class="stat-row"><span class="k">Net worth at age 100</span><span class="v">${fmt$exact(last.nw)}</span></div>
     <div class="stat-row"><span class="k">Annual 401K contribution</span><span class="v">${fmt$exact(now.toK401)}</span></div>
-    <div class="stat-row"><span class="k">529 per child /yr ($200/mo)</span><span class="v">${fmt$exact(I.k529)}</span></div>
+    <div class="stat-row"><span class="k">529 per child /yr</span><span class="v">${fmt$exact(I.k529)}</span></div>
     <div class="stat-row"><span class="k">Child 1 529 at 18 (${proj.hCollegeStart})</span><span class="v" style="color:${proj.hlow529At18 >= proj.hCollegeCost*4*0.5?'var(--accent2)':'var(--accent4)'}">${fmt$exact(proj.hlow529At18||0)} <span style="color:var(--text-mute);font-size:10px">/ ${fmt$exact(proj.hCollegeCost*4)} est.</span></span></div>
     <div class="stat-row"><span class="k">Child 2 529 at 18 (${proj.eCollegeStart})</span><span class="v" style="color:${proj.emme529At18 >= proj.eCollegeCost*4*0.5?'var(--accent2)':'var(--accent4)'}">${fmt$exact(proj.emme529At18||0)} <span style="color:var(--text-mute);font-size:10px">/ ${fmt$exact(proj.eCollegeCost*4)} est.</span></span></div>
     <div class="stat-row"><span class="k">Child 3 529 at 18 (${proj.eCollegeStart})</span><span class="v" style="color:${proj.rees529At18 >= proj.eCollegeCost*4*0.5?'var(--accent2)':'var(--accent4)'}">${fmt$exact(proj.rees529At18||0)} <span style="color:var(--text-mute);font-size:10px">/ ${fmt$exact(proj.eCollegeCost*4)} est.</span></span></div>
@@ -1359,9 +1359,6 @@ function categorize(desc, type, withdrawal, deposit, checkNum){
 
   // ---- Childcare-specific vendors — add your nanny/daycare rules here ----
 
-  // ---- Large checks (≥$4K) are house-project one-offs — count toward housing ----
-  if (type === 'CHECK' && w >= OUTLIER_CHECK_THRESHOLD) return {cat:'housing', amt: w};
-
   // ---- Apple Card payment: already captured by Apple Card line items ----
   if (d.includes('APPLECARD GSBANK')) return {cat:'skip', amt:0};
 
@@ -1381,14 +1378,6 @@ function categorize(desc, type, withdrawal, deposit, checkNum){
 
   // ---- Check overrides (specific check numbers you've identified) ----
   if (type === 'CHECK' && checkNum && CHECK_OVERRIDES[checkNum]) return {cat: CHECK_OVERRIDES[checkNum], amt: w};
-
-  // ---- Childcare: generic $300–$500 checks = weekly nanny ($350–$400); $500–$1200 = camp/daycare deposits ----
-  if (type === 'CHECK' && w >= 300 && w <= 500)  return {cat:'childcare', amt: w};
-  if (type === 'CHECK' && w >  500 && w <= 1200) return {cat:'childcare', amt: w};
-
-  // ---- Any CHECK over $1200 that didn't match overrides or childcare is almost certainly a
-  // house project / contractor payment — count toward housing.
-  if (type === 'CHECK' && w > 1200) return {cat:'housing', amt: w};
 
   // ---- Groceries / Shopping (checking) ----
   if (d.includes('COSTCO') || d.includes('WHOLE FOODS') || d.includes('TRADER JOE')) return {cat:'groceries', amt: w};
@@ -2876,7 +2865,7 @@ function renderPortfolioAnalysis(){
       title: '529 accounts not fully opened',
       flag: 'one or more kids missing',
       color: 'var(--violet)',
-      body: `One or more children's 529s show $0. Every month without a 529 is compounding lost. At 7% growth, $200/mo started today vs. 6 months from now = ~$4K difference at age 18.`,
+      body: `One or more children's 529s show $0. Every month without a 529 is compounding lost — even modest monthly contributions started early can compound meaningfully by age 18.`,
       action: `Open a 529 for each child. Consider your state's plan if it offers a tax deduction.`,
     });
   }
@@ -3082,7 +3071,7 @@ function renderAppleCard(){
     data:{labels:monthLabels, datasets:[
       {label:'Apple Card', data:acByMonth,  backgroundColor:'rgba(165,139,255,.7)', borderWidth:0, stack:'s'},
       {label:'Checking',   data:chkByMonth, backgroundColor:'rgba(0,229,255,.55)',  borderWidth:0, stack:'s'},
-      {label:'Budget ($12K/mo)', data:monthLabels.map(()=>BUDGET_TOTAL),
+      {label:`Budget (${fmt$exact(BUDGET_TOTAL)}/mo)`, data:monthLabels.map(()=>BUDGET_TOTAL),
         type:'line', borderColor:'#00e5ff', backgroundColor:'transparent',
         pointRadius:3, borderWidth:2, borderDash:[4,4], stack:undefined},
     ]},
