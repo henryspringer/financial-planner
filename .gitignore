@@ -1,0 +1,44 @@
+# User data — never commit
+*.csv
+*.xlsx
+*.xls
+*.pdf
+
+# Private / personal variants of the app
+*.private.html
+*.private.js
+index.private.html
+user-rules.js
+user-data/
+docs/user-data/
+
+# Local notes
+NOTES.md
+notes/
+scratch/
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+Thumbs.db
+
+# Node / build tooling (in case anyone adds a build step later)
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+
+# Claude Code / agent caches
+.claude/
+.anthropic/
+
+# The original private source + personal instructions — keep out of any public fork
+springer-planner*.html
+Financial-Planner-Instructions*.md
+*-Instructions*.md
