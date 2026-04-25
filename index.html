@@ -195,7 +195,7 @@
   }
 </style>
 </head>
-<body>
+<body class="light">
 <header>
   <div class="brand"><span class="dot"></span>FINANCIAL<span class="sep">//</span>PLANNER</div>
   <div style="display:flex;align-items:center;gap:10px">
@@ -203,7 +203,7 @@
     <button class="tab-btn" id="tab-spending" onclick="switchTab('spending')">SPENDING</button>
     <button class="tab-btn" id="tab-portfolio" onclick="switchTab('portfolio')">PORTFOLIO</button>
     <div style="width:1px;height:18px;background:var(--border-bright);margin:0 2px"></div>
-    <button id="theme-toggle" onclick="toggleTheme()">☀ LIGHT</button>
+    <button id="theme-toggle" onclick="toggleTheme()">☾ DARK</button>
     <div class="timestamp" id="ts">—</div>
   </div>
 </header>
@@ -3200,9 +3200,9 @@ function handleAppleCardCSV(text, save=true){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  if (localStorage.getItem('planner_theme') === 'light'){
-    document.body.classList.add('light');
-    document.getElementById('theme-toggle').textContent = '☾ DARK';
+  if (localStorage.getItem('planner_theme') === 'dark'){
+    document.body.classList.remove('light');
+    document.getElementById('theme-toggle').textContent = '☀ LIGHT';
   }
   document.getElementById('ts').textContent = new Date().toISOString().slice(0,19).replace('T',' ')+' UTC';
   document.querySelectorAll('input[type=range],input[type=number],input[type=checkbox]')
