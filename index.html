@@ -742,18 +742,18 @@ const TWINS_BIRTH  = new Date(CURRENT_YEAR, 0, 1);  // Child 2 / Child 3 — REP
 const CC_ESCALATION  = 0.05;       // 5%/yr cost escalation
 const FREE_CARE_AGE  = 4;          // Pre-K or K — both free from this age
 const KINDERGARTEN_AGE = 5;        // kept for reference
-const NANNY_WEEKLY   = 750;        // household nanny rate (summers before Ocean House)
+const NANNY_WEEKLY   = 0;          // household nanny rate (set per family)
 
-// Ocean House weekly rates (5 days/wk) — also used as proxy for Kids World
+// Daycare weekly rates by age — set per family
 function ohWeeklyRate(ageYears){
-  if (ageYears < 1) return 360;   // New Beginnings
-  if (ageYears < 2) return 345;   // Little Treasures
-  if (ageYears < 4) return 315;   // Pioneers / Explorers (~2–4)
-  return 305;                      // Adventurers (~4–5)
+  if (ageYears < 1) return 0;
+  if (ageYears < 2) return 0;
+  if (ageYears < 4) return 0;
+  return 0;
 }
 
-// Social Security assumption (today's dollars)
-const SS_PER_SPOUSE_AT_67 = 45000;
+// Social Security assumption (today's dollars) — set to your expected benefit
+const SS_PER_SPOUSE_AT_67 = 0;
 const SS_START_AGE = 67;
 
 // College cost assumption (today's dollars, 5% inflation)
@@ -1288,17 +1288,17 @@ const CHECK_OVERRIDES = {
 
 // ====== 11-category budget (locked in — trailing 12m informed) ======
 const BUDGETS = {
-  housing:       4800,
-  childcare:     1600,
-  groceries:      950,
-  dining:         750,
-  transport:      700,
-  travel:         350,
-  shopping:       750,
-  subs:           100,
-  health:         300,
-  golf:           500,
-  other:         1200,
+  housing:       0,
+  childcare:     0,
+  groceries:     0,
+  dining:        0,
+  transport:     0,
+  travel:        0,
+  shopping:      0,
+  subs:          0,
+  health:        0,
+  golf:          0,
+  other:         0,
 };
 const BUDGET_TOTAL = Object.values(BUDGETS).reduce((a,b)=>a+b,0); // 12,000
 
