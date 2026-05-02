@@ -61,12 +61,12 @@
   }
   .tab-btn:hover{border-color:var(--accent);color:var(--accent)}
   .tab-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,.08)}
-  #theme-toggle{
+  #theme-toggle, .hdr-btn{
     background:none;border:1px solid var(--border-bright);color:var(--text-dim);
     padding:5px 12px;border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;
     font-size:11px;letter-spacing:.1em;transition:all .2s;
   }
-  #theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  #theme-toggle:hover, .hdr-btn:hover{border-color:var(--accent);color:var(--accent)}
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Space Grotesk','Helvetica Neue',sans-serif;min-height:100vh}
   body{
@@ -203,6 +203,9 @@
     <button class="tab-btn" id="tab-spending" onclick="switchTab('spending')">SPENDING</button>
     <button class="tab-btn" id="tab-portfolio" onclick="switchTab('portfolio')">PORTFOLIO</button>
     <div style="width:1px;height:18px;background:var(--border-bright);margin:0 2px"></div>
+    <button class="hdr-btn" onclick="exportBackup('planner_')" title="Download all your data as a JSON backup file">⬇ BACKUP</button>
+    <button class="hdr-btn" onclick="document.getElementById('restore-file').click()" title="Restore from a previously downloaded backup file">⬆ RESTORE</button>
+    <input type="file" id="restore-file" accept=".json,application/json" style="display:none" onchange="if(this.files[0]){importBackup('planner_', this.files[0]);this.value=''}">
     <button id="theme-toggle" onclick="toggleTheme()">☾ DARK</button>
     <div class="timestamp" id="ts">—</div>
   </div>
@@ -2885,6 +2888,78 @@ function renderPortfolioAnalysis(){
       <p style="font-size:12px;color:var(--text-dim);line-height:1.65;margin:0 0 10px">${item.body}</p>
       <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:${item.color};background:rgba(0,0,0,.15);padding:8px 10px;border-radius:3px">ACTION → ${item.action}</div>
     </div>`).join('');
+}
+
+// ---- Backup / Restore ----
+// Export every localStorage key starting with `prefix` to a JSON file the user
+// can drag into iCloud/Dropbox/a backup folder. Restore reads the file back.
+function exportBackup(prefix){
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++){
+    const key = localStorage.key(i);
+    if (key && key.startsWith(prefix)) data[key] = localStorage.getItem(key);
+  }
+  const keyCount = Object.keys(data).length;
+  if (keyCount === 0){
+    alert('No data to back up yet — upload some statements first.');
+    return;
+  }
+  const stamp = new Date().toISOString().slice(0,10);
+  const payload = {
+    version: 1,
+    prefix,
+    exportedAt: new Date().toISOString(),
+    keyCount,
+    data,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `planner-backup-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(prefix, file){
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed || !parsed.data || typeof parsed.data !== 'object'){
+        throw new Error('Not a valid planner backup file (missing "data" object).');
+      }
+      const sourcePrefix = parsed.prefix;
+      const incomingKeys = Object.keys(parsed.data);
+      if (incomingKeys.length === 0){
+        alert('Backup file is empty.');
+        return;
+      }
+      let remap = false;
+      if (sourcePrefix && sourcePrefix !== prefix){
+        if (!confirm(`This backup was made for prefix "${sourcePrefix}" but this app uses "${prefix}".\n\nRestore anyway? Keys will be remapped to the local prefix.`)) return;
+        remap = true;
+      }
+      if (!confirm(`Restore ${incomingKeys.length} keys from this backup?\n\nExisting "${prefix}" data will be overwritten.`)) return;
+      const existing = [];
+      for (let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if (k && k.startsWith(prefix)) existing.push(k);
+      }
+      existing.forEach(k => localStorage.removeItem(k));
+      Object.entries(parsed.data).forEach(([k, v]) => {
+        const newKey = remap ? prefix + k.slice(sourcePrefix.length) : k;
+        localStorage.setItem(newKey, String(v));
+      });
+      alert(`Restored ${incomingKeys.length} keys. Reloading…`);
+      location.reload();
+    } catch (err){
+      alert('Failed to restore backup: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
 }
 
 function toggleTheme(){
