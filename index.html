@@ -2049,30 +2049,50 @@ const TAG_COLORS = {
   action: 'var(--accent3)',
 };
 
+// ---- Reminder completion tracking ----
+// Each completed reminder is stored as `planner_remdone_<slug>` → 'YYYY-MM-DD'
+// of the occurrence that was checked. When the next occurrence comes around,
+// the stored date no longer matches and the checkbox auto-resets.
+const REM_DONE_PREFIX = 'planner_remdone_';
+function remSlug(label){
+  return label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,60);
+}
+function ymd(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function isReminderDone(label, dueDate){
+  return localStorage.getItem(REM_DONE_PREFIX + remSlug(label)) === dueDate;
+}
+function toggleReminderDone(label, dueDate, checked){
+  const key = REM_DONE_PREFIX + remSlug(label);
+  if (checked) localStorage.setItem(key, dueDate);
+  else localStorage.removeItem(key);
+  renderReminders();
+}
+
 function renderReminders(){
   const now = new Date();
   const todayMo = now.getMonth() + 1; // 1-based
   const todayDay = now.getDate();
   const todayYear = now.getFullYear();
 
-  function daysUntil(mo, day, freq){
+  function nextOccurrence(mo, day, freq){
     if (freq === 'monthly'){
-      // Next occurrence of this day-of-month
       let d = new Date(todayYear, todayMo-1, day);
       if (d < now) d = new Date(todayYear, todayMo, day);
-      return Math.round((d - now) / 86400000);
+      return d;
     }
-    // Annual
     let d = new Date(todayYear, mo-1, day);
     if (d < now) d = new Date(todayYear+1, mo-1, day);
-    return Math.round((d - now) / 86400000);
+    return d;
   }
+  function daysUntil(d){ return Math.round((d - now) / 86400000); }
 
-  // Compute days until for all, sort by soonest
-  const items = REMINDERS.map(r => ({...r, days: daysUntil(r.month, r.day, r.freq)}))
-    .sort((a,b) => a.days - b.days);
+  const items = REMINDERS.map(r => {
+    const due = nextOccurrence(r.month, r.day, r.freq);
+    return {...r, days: daysUntil(due), dueDate: ymd(due), done: isReminderDone(r.label, ymd(due))};
+  }).sort((a,b) => a.days - b.days);
 
-  // Group: overdue/this week (≤7d), this month (≤30d), upcoming (≤90d), future
   function statusStyle(days){
     if (days <= 0)  return {label:'OVERDUE',    border:'var(--accent3)', bg:'rgba(255,85,119,.06)'};
     if (days <= 7)  return {label:'THIS WEEK',  border:'var(--accent3)', bg:'rgba(255,85,119,.04)'};
@@ -2088,32 +2108,48 @@ function renderReminders(){
     {title:'Later This Year',     filter: r => r.days > 90},
   ];
 
+  const itemsIncomplete = items.filter(r => !r.done);
+  const itemsDone = items.filter(r => r.done);
+
+  function renderItem(r){
+    const st = statusStyle(r.days);
+    const tagColor = TAG_COLORS[r.tag] || 'var(--text-dim)';
+    const dueLabel = r.done ? 'done · resets next cycle'
+      : r.days <= 0 ? `${Math.abs(r.days)}d overdue`
+      : r.days === 0 ? 'today'
+      : `${r.days}d`;
+    const freqLabel = r.freq === 'monthly' ? 'MONTHLY' : r.freq === 'annual' ? 'ANNUAL' : '';
+    const labelEsc = r.label.replace(/'/g, "\\'");
+    const doneStyle = r.done ? 'opacity:.45;text-decoration:line-through' : '';
+    return `
+      <div style="background:${r.done?'transparent':st.bg};border:1px solid ${r.done?'var(--border)':st.border};border-radius:4px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px">
+        <input type="checkbox" ${r.done?'checked':''} onclick="toggleReminderDone('${labelEsc}','${r.dueDate}',this.checked)" style="margin-top:3px;cursor:pointer;accent-color:var(--accent2)" title="${r.done?'Mark as not done':'Mark this occurrence as done'}">
+        <div style="flex:1;min-width:0;${doneStyle}">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+            <span style="font-size:12px;font-weight:600;color:var(--text)">${r.label}</span>
+            <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${tagColor};background:rgba(0,0,0,.15);padding:1px 6px;border-radius:3px">${r.tag.toUpperCase()}</span>
+            <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-mute)">${freqLabel}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-dim);line-height:1.5">${r.detail}</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${r.done?'var(--text-mute)':(r.days<=7?'var(--accent3)':'var(--text-mute)')};white-space:nowrap;font-weight:600">${dueLabel}</div>
+      </div>`;
+  }
+
   let html = '';
   for (const sec of sections){
-    const group = items.filter(sec.filter);
+    const group = itemsIncomplete.filter(sec.filter);
     if (!group.length) continue;
     html += `<div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin:16px 0 8px;text-transform:uppercase">${sec.title}</div>`;
     html += `<div style="display:grid;gap:6px">`;
-    for (const r of group){
-      const st = statusStyle(r.days);
-      const tagColor = TAG_COLORS[r.tag] || 'var(--text-dim)';
-      const dueLabel = r.days <= 0 ? `${Math.abs(r.days)}d overdue`
-        : r.days === 0 ? 'today'
-        : `${r.days}d`;
-      const freqLabel = r.freq === 'monthly' ? 'MONTHLY' : r.freq === 'annual' ? 'ANNUAL' : '';
-      html += `
-        <div style="background:${st.bg};border:1px solid ${st.border};border-radius:4px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px">
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-              <span style="font-size:12px;font-weight:600;color:var(--text)">${r.label}</span>
-              <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:${tagColor};background:rgba(0,0,0,.15);padding:1px 6px;border-radius:3px">${r.tag.toUpperCase()}</span>
-              <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text-mute)">${freqLabel}</span>
-            </div>
-            <div style="font-size:11px;color:var(--text-dim);line-height:1.5">${r.detail}</div>
-          </div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${r.days<=7?'var(--accent3)':'var(--text-mute)'};white-space:nowrap;font-weight:600">${dueLabel}</div>
-        </div>`;
-    }
+    for (const r of group) html += renderItem(r);
+    html += `</div>`;
+  }
+
+  if (itemsDone.length){
+    html += `<div style="font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.15em;color:var(--text-mute);margin:18px 0 8px;text-transform:uppercase">Done This Cycle (${itemsDone.length})</div>`;
+    html += `<div style="display:grid;gap:6px">`;
+    for (const r of itemsDone) html += renderItem(r);
     html += `</div>`;
   }
 
