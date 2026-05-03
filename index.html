@@ -1234,13 +1234,19 @@ function renderReadouts(proj, I){
   }
   v.innerHTML = `<div class="verdict ${cls}"><span class="icon">${icon}</span><span class="txt">${txt}</span></div>`;
 
-  // ledger — build annual actuals lookup from parsedRows
+  // ledger — build annual actuals lookup from BOTH checking (parsedRows) and Apple Card (acRows).
+  // Checking-side AC payments are already skip'd by categorize(), so no double-count.
   const actualsByYear = {};
   for (const r of parsedRows) {
     if (r.cat === 'skip') continue;
     if (!actualsByYear[r.year]) actualsByYear[r.year] = {income:0, spend:0};
     if (r.cat === 'income') actualsByYear[r.year].income += r.amt;
     else if (r.cat !== 'savings' && r.cat !== 'brokin' && r.cat !== 'outlier') actualsByYear[r.year].spend += r.amt;
+  }
+  for (const r of acRows) {
+    const yr = r.stmtYr;
+    if (!actualsByYear[yr]) actualsByYear[yr] = {income:0, spend:0};
+    actualsByYear[yr].spend += r.amt;
   }
 
   const td = (val, opts='') => `<td style="text-align:right;padding:6px 8px;border-bottom:1px solid rgba(27,37,64,.5)${opts}">${val}</td>`;
