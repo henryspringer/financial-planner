@@ -543,15 +543,9 @@
       <div id="ac-content" style="display:none">
         <div id="ac-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:18px"></div>
 
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px" class="ac-grid-two">
-          <div>
-            <h4 style="font-size:12px;letter-spacing:.08em;color:var(--text-mute);margin:0 0 8px">MONTHLY TOTALS — APPLE CARD VS CHECKING</h4>
-            <div class="chart-wrap small"><canvas id="chart-ac-monthly"></canvas></div>
-          </div>
-          <div>
-            <h4 style="font-size:12px;letter-spacing:.08em;color:var(--text-mute);margin:0 0 8px">CARDHOLDER SPLIT (APPLE CARD)</h4>
-            <div class="chart-wrap small"><canvas id="chart-ac-hh"></canvas></div>
-          </div>
+        <div style="margin-bottom:18px">
+          <h4 style="font-size:12px;letter-spacing:.08em;color:var(--text-mute);margin:0 0 8px">MONTHLY TOTALS — APPLE CARD VS CHECKING</h4>
+          <div class="chart-wrap small"><canvas id="chart-ac-monthly"></canvas></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px" class="ac-grid-two">
@@ -2977,7 +2971,7 @@ function toggleTheme(){
 
 // ====== Apple Card ======
 let acRows = []; // parsed Apple Card transactions
-let chartAcMonthly = null, chartAcHH = null, chartAcCat = null;
+let chartAcMonthly = null, chartAcCat = null;
 
 // Map Apple Card category strings → display labels + colors
 const AC_CAT_COLORS = {
@@ -3117,12 +3111,8 @@ function renderAppleCard(){
   let chkTotal   = 0;
   months.forEach(m=>{ const [y,mo]=m.split('-'); const d=chkMonthData(y,mo); Object.values(d).forEach(v=>chkTotal+=v); });
   const grandTotal = acTotal + chkTotal;
-  // Split Apple Card spending by cardholder — uses the two unique `who` values present in the data.
-  const whoList = [...new Set(acRowsInRange.map(r=>(r.who||'').trim()).filter(Boolean))].sort();
-  const whoA = whoList[0] || '';
-  const whoB = whoList[1] || '';
-  const henryAmt  = whoA ? acRowsInRange.filter(r=>(r.who||'').trim()===whoA).reduce((s,r)=>s+r.amt,0) : 0;
-  const hadleyAmt = whoB ? acRowsInRange.filter(r=>(r.who||'').trim()===whoB).reduce((s,r)=>s+r.amt,0) : 0;
+  const incomeTotal = parsedRowsInRange.filter(r => r.cat === 'income').reduce((s,r)=>s+r.amt, 0);
+  const netIncome   = incomeTotal - grandTotal;
   const uniqueMerchants = new Set(acRowsInRange.map(r=>r.merchant)).size;
   const bigTxns = acRowsInRange.filter(r=>r.amt>=200).length +
     parsedRowsInRange.filter(r=>r.amt>=200&&r.cat!=='skip'&&r.cat!=='income'&&r.cat!=='outlier'&&!((r.desc||'').toUpperCase().includes('APPLECARD GSBANK'))).length;
@@ -3136,12 +3126,12 @@ function renderAppleCard(){
       <div style="font-size:10px;color:var(--text-dim);margin-top:3px">${sub}</div>
     </div>`;
   kpiEl.innerHTML =
-    kpi('TOTAL SPEND',  fmt$exact(grandTotal), months.length+' month'+(months.length!==1?'s':''), 'var(--violet)') +
-    kpi('APPLE CARD',   fmt$exact(acTotal),    Math.round(acTotal/grandTotal*100)+'% of total',  'var(--accent)') +
-    kpi('CHECKING',     fmt$exact(chkTotal),   Math.round(chkTotal/grandTotal*100)+'% of total (excl. AC pmt)', 'var(--accent2)') +
-    kpi('APPLE: '+(whoA||'CARDHOLDER 1').toUpperCase(), fmt$exact(henryAmt),   acTotal>0?Math.round(henryAmt/acTotal*100)+'% of AC':'—',        'var(--text)') +
-    kpi('APPLE: '+(whoB||'CARDHOLDER 2').toUpperCase(), fmt$exact(hadleyAmt),  acTotal>0?Math.round(hadleyAmt/acTotal*100)+'% of AC':'—',       'var(--text)') +
-    kpi('LARGE TXN',    bigTxns,               'transactions ≥$200', 'var(--accent4)');
+    kpi('TOTAL INCOME', fmt$exact(incomeTotal), months.length+' month'+(months.length!==1?'s':''), 'var(--accent2)') +
+    kpi('TOTAL SPEND',  fmt$exact(grandTotal),  months.length+' month'+(months.length!==1?'s':''), 'var(--violet)') +
+    kpi('NET INCOME',   fmt$exact(netIncome),   netIncome>=0?'income − spend':'overspending vs income', netIncome>=0?'#7afcb0':'#ff5577') +
+    kpi('APPLE CARD',   fmt$exact(acTotal),     grandTotal>0?Math.round(acTotal/grandTotal*100)+'% of spend':'—',  'var(--accent)') +
+    kpi('CHECKING',     fmt$exact(chkTotal),    grandTotal>0?Math.round(chkTotal/grandTotal*100)+'% of spend (excl. AC pmt)':'—', 'var(--accent2)') +
+    kpi('LARGE TXN',    bigTxns,                'transactions ≥$200', 'var(--accent4)');
 
   // ---- Monthly totals: Apple Card total vs Checking total ----
   const acByMonth  = months.map(m=>{ const [y,mo]=m.split('-'); return acRows.filter(r=>r.stmtYr===+y&&r.stmtMo===+mo).reduce((s,r)=>s+r.amt,0)||null; });
@@ -3165,19 +3155,6 @@ function renderAppleCard(){
             footer:items=>'Total: '+fmt$exact(items.reduce((s,i)=>s+(i.parsed.y||0),0))}}},
       scales:{x:{stacked:true,grid:{display:false}},
         y:{stacked:true,grid:{color:'rgba(138,155,184,.05)'},ticks:{callback:v=>fmt$(v)}}}}
-  });
-
-  // ---- Cardholder split doughnut (Apple Card only — checking has no per-person data) ----
-  if (chartAcHH) chartAcHH.destroy();
-  chartAcHH = new Chart(document.getElementById('chart-ac-hh').getContext('2d'),{
-    type:'doughnut',
-    data:{labels:[(whoA||'Cardholder 1')+' (AC)', (whoB||'Cardholder 2')+' (AC)'], datasets:[{data:[henryAmt||0, hadleyAmt||0],
-      backgroundColor:['rgba(0,229,255,.8)','rgba(122,252,176,.8)'],
-      borderColor:'#0b1120',borderWidth:2}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',
-      plugins:{
-        legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10}},
-        tooltip:{callbacks:{label:ctx=>ctx.label+': '+fmt$exact(ctx.parsed)+' ('+Math.round(ctx.parsed/(acTotal||1)*100)+'% of AC)'}}}},
   });
 
   // ---- Category chart: Apple Card categories + checking categories stacked by month ----
