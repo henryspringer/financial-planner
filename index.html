@@ -574,7 +574,7 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px">
         <div>
           <h3 style="margin-bottom:4px">Actuals — monthly spending tracker</h3>
-          <p class="desc" style="margin:0">Budget set per category in source (<code>BUDGETS</code>) across 11 categories. Apple Card + checking combined. Add your own merchant and check-number rules in <code>categorize()</code> and <code>CHECK_OVERRIDES</code>.</p>
+          <p class="desc" style="margin:0">Budget set per category in source (<code>BUDGETS</code>) across 12 categories. Apple Card + checking combined. Add your own merchant and check-number rules in <code>categorize()</code> and <code>CHECK_OVERRIDES</code>.</p>
         </div>
         <select id="actuals-year-select" style="display:none;background:var(--bg-card);border:1px solid var(--border-bright);color:var(--text);padding:6px 10px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;outline:none"
           onchange="actualsView=this.value==='rolling12'?'rolling12':+this.value;syncYearSelectors();renderActuals(parsedRows,readInputs().baseMo);if(acRows.length||parsedRows.length)renderAppleCard()"></select>
@@ -584,7 +584,7 @@
         <table class="actuals-table" id="actuals-table" style="display:none">
           <thead><tr>
             <th style="text-align:left">MONTH</th>
-            <th>HOUSING</th><th>CHILDCARE</th><th>GROCERIES</th><th>DINING</th>
+            <th>HOUSING</th><th>UTILITIES</th><th>CHILDCARE</th><th>GROCERIES</th><th>DINING</th>
             <th>TRANSPORT</th><th>TRAVEL</th><th>SHOPPING</th><th>SUBS</th>
             <th>HEALTH</th><th>GOLF</th><th>OTHER</th>
             <th>TOTAL SPEND</th><th>VS BUDGET</th>
@@ -1290,9 +1290,10 @@ const CHECK_OVERRIDES = {
   // Add specific check numbers here, e.g. '107': 'housing'
 };
 
-// ====== 11-category budget (locked in — trailing 12m informed) ======
+// ====== 12-category budget (locked in — trailing 12m informed) ======
 const BUDGETS = {
   housing:       0,
+  utilities:     0,
   childcare:     0,
   groceries:     0,
   dining:        0,
@@ -1309,6 +1310,7 @@ const BUDGET_TOTAL = Object.values(BUDGETS).reduce((a,b)=>a+b,0); // 12,000
 // Category display metadata: order, label, color
 const CAT_META = {
   housing:   {label:'Housing',        color:'rgba(0,229,255,.75)'},
+  utilities: {label:'Utilities',      color:'rgba(79,209,197,.75)'},
   childcare: {label:'Childcare',      color:'rgba(165,139,255,.75)'},
   groceries: {label:'Groceries',      color:'rgba(104,211,145,.75)'},
   dining:    {label:'Dining',         color:'rgba(122,252,176,.75)'},
@@ -1439,7 +1441,7 @@ function parseCSV(text){
   return rows;
 }
 
-// Map Apple Card's native category strings → our 11-category budget bucket.
+// Map Apple Card's native category strings → our 12-category budget bucket.
 // Apple Card exports use these exact category names (verified from real CSVs):
 //   Grocery, Restaurants, Shopping, Other, Utilities, Transportation,
 //   Entertainment, Medical, Airlines, Installment, Payment
@@ -1476,10 +1478,12 @@ const AC_MERCHANT_OVERRIDES = [
   {pat:/KINDLE|AUDIBLE|NYTIMES|NEW YORK TIMES|WSJ|SUBSTACK|PATREON/i, cat:'subs'},
   {pat:/PRIME VIDEO|AMAZON PRIME\*|AMZN PRIME/i, cat:'subs'},
   // Add your subscription merchants here
-  // Housing — internet, utilities, insurance, home services paid on card
+  // Housing — internet, insurance, home services paid on card
   {pat:/SPECTRUM|XFINITY|COMCAST|VERIZON FIOS/i, cat:'housing'},
   {pat:/PROGRESSIVE|GEICO|ALLSTATE|STATE FARM|LIBERTY MUTUAL/i, cat:'housing'},
-  // Add your regional ISP / utility / contractor rules here
+  // Add your regional ISP / contractor rules here
+  // Utilities — heat (oil/propane), gas. Electric and water typically paid via checking.
+  // Add your heat/oil/propane vendors here, e.g. {pat:/SUBURBAN PROPANE|FIELDING/i, cat:'utilities'},
   // Groceries
   {pat:/COSTCO|WHOLE FOODS|TRADER JOE/i, cat:'groceries'},
   // Shopping — Amazon lumps into "Other"; catch any Amazon merchant string
@@ -1842,7 +1846,7 @@ async function fetchCryptoPrices(){
 }
 
 function readInputs(){
-  // Monthly budget — locked at $12K total across 11 categories (BUDGETS constant).
+  // Monthly budget — locked at $12K total across 12 categories (BUDGETS constant).
   // baseMo excludes childcare (modeled dynamically by the childcare schedule).
   const houseMo = BUDGETS.housing;
   const discMo  = BUDGETS.groceries + BUDGETS.dining + BUDGETS.shopping + BUDGETS.subs + BUDGETS.health + BUDGETS.travel + BUDGETS.golf;
@@ -3079,9 +3083,10 @@ function parseAppleCardCSV(text){
 const MONTH_NAMES_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 // Checking-side display metadata for the combined Apple Card view.
-// Keys must match our 11 budget categories emitted by categorize().
+// Keys must match our 12 budget categories emitted by categorize().
 const CHK_CAT_META = {
   housing:   {label:'Housing (chk)',       color:'rgba(0,229,255,.75)'},
+  utilities: {label:'Utilities (chk)',     color:'rgba(79,209,197,.75)'},
   childcare: {label:'Childcare (chk)',     color:'rgba(165,139,255,.75)'},
   transport: {label:'Transportation (chk)',color:'rgba(255,179,71,.75)'},
   groceries: {label:'Groceries (chk)',     color:'rgba(104,211,145,.75)'},
@@ -3445,7 +3450,7 @@ function buildQRPrompt(kind){
   const q = latestCompletedQuarter();
   if (kind === 'spending'){
     const s = buildSpendingSnapshot(q);
-    return `You are a financial analyst producing a quarterly spending review for a household using an 11-category budget framework.
+    return `You are a financial analyst producing a quarterly spending review for a household using an 12-category budget framework.
 
 Do not invent numbers. Use only the data provided below.
 
@@ -3540,7 +3545,7 @@ ${q.label}
 - Expense growth: ${p.I.expGrow||'?'}%
 - 401K contribution %: ${p.I.k401||'?'}%
 - Social Security @ 67: ${p.I.includeSS ? 'included' : 'excluded'}
-- Monthly budget: ${fmt$exact(BUDGET_TOTAL)}/mo across 11 categories
+- Monthly budget: ${fmt$exact(BUDGET_TOTAL)}/mo across 12 categories
 
 ## User context (edit before pasting)
 [Add any context: family situation, risk posture, open action items from prior review, etc.]
