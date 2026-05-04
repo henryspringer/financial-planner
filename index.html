@@ -609,6 +609,7 @@
           </h4>
           <span style="font-size:10px;color:var(--text-dim);font-family:'JetBrains Mono',monospace">Grouped by description, active months only.</span>
         </div>
+        <div id="drill-chart-wrap" class="chart-wrap small" style="margin-bottom:12px"><canvas id="chart-drill-monthly"></canvas></div>
         <div id="other-breakdown-body" style="font-family:'JetBrains Mono',monospace;font-size:11px;max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;padding:8px 12px"></div>
       </div>
 
@@ -1577,6 +1578,75 @@ function otherGroupKey(desc){
 
 let _lastActiveMonths = [];
 
+// Drill-in chart: monthly spend in the selected category (or total if "all"),
+// with a dashed budget reference line. Uses every month in `activeMonths` so
+// you always see the timeline; the month-filter dropdown only narrows the
+// merchant breakdown below.
+function renderDrillChart(activeMonths, targetCat){
+  const wrap = document.getElementById('drill-chart-wrap');
+  const canvas = document.getElementById('chart-drill-monthly');
+  if (!wrap || !canvas) return;
+  if (!activeMonths || !activeMonths.length){
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = '';
+  const MONTH_NAMES_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const months = activeMonths.slice().sort((a,b) => (a.year - b.year) || (a.mo - b.mo));
+  const labels = months.map(m => `${MONTH_NAMES_SHORT[m.mo-1]} ${String(m.year).slice(2)}`);
+
+  const isAll = targetCat === 'all';
+  const sumForMonth = (year, mo) => {
+    const v = aggregateMonth(year, mo);
+    if (isAll) return CAT_KEYS.reduce((s,k) => s + (v[k]||0), 0);
+    return v[targetCat] || 0;
+  };
+  const data = months.map(m => sumForMonth(m.year, m.mo));
+  const budget = isAll ? BUDGET_TOTAL : (BUDGETS[targetCat] || 0);
+  const catLabel = isAll ? 'All categories' : (CAT_META[targetCat]?.label || targetCat);
+  const barColor = isAll ? 'rgba(165,139,255,.7)' : (CAT_META[targetCat]?.color || 'rgba(0,229,255,.7)');
+
+  if (chartDrillIn) chartDrillIn.destroy();
+  const datasets = [{ label: catLabel, data, backgroundColor: barColor, borderWidth: 0 }];
+  if (budget > 0){
+    datasets.push({
+      label: `Budget (${fmt$exact(budget)}/mo)`,
+      data: months.map(()=>budget),
+      type: 'line',
+      borderColor: '#00e5ff', backgroundColor: 'transparent',
+      pointRadius: 3, borderWidth: 2, borderDash: [4,4],
+    });
+  }
+  chartDrillIn = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 10, boxHeight: 10 } },
+        tooltip: {
+          backgroundColor: '#0b1120', borderColor: '#2a3a66', borderWidth: 1,
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + fmt$exact(ctx.parsed.y || 0),
+            footer: items => {
+              const spend = items.find(i => i.dataset.type !== 'line');
+              if (!spend || !budget) return '';
+              const v = spend.parsed.y || 0;
+              const pct = Math.round((v - budget) / budget * 100);
+              return `Variance: ${pct >= 0 ? '+' : ''}${pct}% vs budget`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { grid: { color: 'rgba(138,155,184,.05)' }, ticks: { callback: v => fmt$(v) } },
+      },
+    },
+  });
+}
+
 function renderOtherBreakdown(activeMonths){
   _lastActiveMonths = activeMonths || [];
   const section = document.getElementById('other-breakdown-section');
@@ -1619,6 +1689,9 @@ function renderOtherBreakdown(activeMonths){
       filteredMonths = activeMonths.filter(m => m.year === y && m.mo === mo);
     }
   }
+
+  // ---- Drill-in monthly chart (uses ALL active months, ignores the month filter) ----
+  renderDrillChart(activeMonths, targetCat);
 
   const ymSet = new Set(filteredMonths.map(m => `${m.year}-${String(m.mo).padStart(2,'0')}`));
   const groups = {}; // key → {label, amt, count, source}
@@ -3011,7 +3084,7 @@ function toggleTheme(){
 
 // ====== Apple Card ======
 let acRows = []; // parsed Apple Card transactions
-let chartAcMonthly = null, chartAcCat = null;
+let chartAcMonthly = null, chartAcCat = null, chartDrillIn = null;
 
 // Map Apple Card category strings → display labels + colors
 const AC_CAT_COLORS = {
