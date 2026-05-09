@@ -274,8 +274,12 @@
 
     <h2>Savings & contributions</h2>
     <div class="input-group">
-      <div class="input-row"><label>401K rate (of combined gross)</label><span class="val mono" id="v-k401"></span></div>
-      <input id="i-k401" type="range" min="0" max="25" step="1" value="0">
+      <div class="input-row"><label>Spouse 1 401K rate</label><span class="val mono" id="v-henryK401"></span></div>
+      <input id="i-henryK401" type="range" min="0" max="25" step="1" value="0">
+    </div>
+    <div class="input-group">
+      <div class="input-row"><label>Spouse 2 401K rate</label><span class="val mono" id="v-hadleyK401"></span></div>
+      <input id="i-hadleyK401" type="range" min="0" max="25" step="1" value="0">
     </div>
     <div class="input-group">
       <div class="input-row"><label>529 per child /yr</label><span class="val mono" id="v-k529"></span></div>
@@ -930,8 +934,13 @@ function project(I){
     let gross = 0, take = 0, toK401 = 0;
     if (!isRetired){
       const grow = Math.pow(1 + incGrow, yearsFromNow);
-      gross = (I.henryInc + I.hadleyInc) * grow;
-      toK401 = gross * (I.k401/100);
+      const henryGross  = I.henryInc  * grow;
+      const hadleyGross = I.hadleyInc * grow;
+      gross = henryGross + hadleyGross;
+      const IRS_401K_LIMIT = 23500;
+      const henryToK401  = Math.min(henryGross  * (I.henryK401  / 100), IRS_401K_LIMIT * grow);
+      const hadleyToK401 = Math.min(hadleyGross * (I.hadleyK401 / 100), IRS_401K_LIMIT * grow);
+      toK401 = henryToK401 + hadleyToK401;
       take = (gross - toK401) * (1 - I.taxRate/100);
     }
 
@@ -1940,7 +1949,15 @@ function readInputs(){
     taxRate:   +document.getElementById('i-taxRate').value,
     realRet:   +document.getElementById('i-realRet').value,
     homeRet:   +document.getElementById('i-homeRet').value,
-    k401:      +document.getElementById('i-k401').value,
+    henryK401:  +document.getElementById('i-henryK401').value,
+    hadleyK401: +document.getElementById('i-hadleyK401').value,
+    get k401(){
+      const hi = +document.getElementById('i-henryInc').value;
+      const ha = +document.getElementById('i-hadleyInc').value;
+      const total = hi + ha;
+      if (!total) return 0;
+      return Math.round((this.henryK401 * hi + this.hadleyK401 * ha) / total);
+    },
     k529:      +document.getElementById('i-k529').value,
     houseMo, discMo, carMo, otherMo,
     baseMo: houseMo + discMo + carMo + otherMo,
@@ -1977,7 +1994,8 @@ function updateLabels(I){
   document.getElementById('v-taxRate').textContent   = I.taxRate+'%';
   document.getElementById('v-realRet').textContent   = I.realRet.toFixed(1)+'%';
   document.getElementById('v-homeRet').textContent   = I.homeRet.toFixed(1)+'%';
-  document.getElementById('v-k401').textContent      = I.k401+'%';
+  document.getElementById('v-henryK401').textContent  = I.henryK401+'%';
+  document.getElementById('v-hadleyK401').textContent = I.hadleyK401+'%';
   document.getElementById('v-k529').textContent      = fmt$exact(I.k529);
   const readout = document.getElementById('budget-readout');
   if (readout && !readout.dataset.rendered){
@@ -3622,7 +3640,7 @@ ${q.label}
 ## Assumptions
 - Real return: ${p.I.realRet||'?'}%
 - Expense growth: ${p.I.expGrow||'?'}%
-- 401K contribution %: ${p.I.k401||'?'}%
+- 401K contributions: Spouse 1 ${p.I.henryK401||0}% · Spouse 2 ${p.I.hadleyK401||0}% (combined-weighted ~${p.I.k401||0}%)
 - Social Security @ 67: ${p.I.includeSS ? 'included' : 'excluded'}
 - Monthly budget: ${fmt$exact(BUDGET_TOTAL)}/mo across 12 categories
 
