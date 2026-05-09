@@ -229,6 +229,10 @@
       <input id="i-henryAge" type="range" min="0" max="80" step="1" value="0">
     </div>
     <div class="input-group">
+      <div class="input-row"><label>Spouse 2 age today</label><span class="val mono" id="v-hadleyAge"></span></div>
+      <input id="i-hadleyAge" type="range" min="0" max="80" step="1" value="0">
+    </div>
+    <div class="input-group">
       <div class="input-row"><label>Retire at</label><span class="val mono" id="v-retireAge"></span></div>
       <input id="i-retireAge" type="range" min="0" max="80" step="1" value="0">
     </div>
@@ -1927,6 +1931,7 @@ function readInputs(){
   const otherMo = BUDGETS.other;
   return {
     henryAge:  +document.getElementById('i-henryAge').value,
+    hadleyAge: +document.getElementById('i-hadleyAge').value,
     retireAge: +document.getElementById('i-retireAge').value,
     henryInc:  +document.getElementById('i-henryInc').value,
     hadleyInc: +document.getElementById('i-hadleyInc').value,
@@ -1963,6 +1968,7 @@ function readInputs(){
 
 function updateLabels(I){
   document.getElementById('v-henryAge').textContent  = I.henryAge;
+  document.getElementById('v-hadleyAge').textContent = I.hadleyAge;
   document.getElementById('v-retireAge').textContent = I.retireAge;
   document.getElementById('v-henryInc').textContent  = fmt$exact(I.henryInc);
   document.getElementById('v-hadleyInc').textContent = fmt$exact(I.hadleyInc);
